@@ -27,6 +27,11 @@ var file := {
 		"campaign": "SMB1",
 		"lang": "en"
 	},
+	"osc": {
+		"visibility": 0,
+		"transition_visibility": 1,
+		"haptic_feedback": 0
+	},
 	"keyboard":
 	{
 		"jump": "Z",

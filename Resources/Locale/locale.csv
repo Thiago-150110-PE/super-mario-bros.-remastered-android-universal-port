@@ -660,13 +660,13 @@ RESOURCE_PACK_WARNING_LOCATION,,"YOU CURRENTLY HAVE TO INSTALL TO /DATA/DATA/NET
 VIDEO_ASPECT_16_10,,16:10,16:10,16:10,16:10,16:10,16:10,16:10,16:10,16:10,16:10,16:10,16:10,16:10
 VIDEO_ASPECT_FILL,,Fill,Remplir,Wypełnij,заполнить,rellenar,riempi,,punuin,füllen,doldur,isi,preencher,画面に合わせる
 ,,,,,,,,,,,,,,
-,,,,,,,,,,,,,,
-,,,,,,,,,,,,,,
-,,,,,,,,,,,,,,
-,,,,,,,,,,,,,,
-,,,,,,,,,,,,,,
-,,,,,,,,,,,,,,
-,,,,,,,,,,,,,,
+SETTINGS_OSC,,Touch Controls,Commandes tactiles,Sterowanie dotykowe,cehcophoe Упpabлehиe,Controles táctiles,Controlli touch,ＴＯＵＣＨ ＣＯＮＴＲＯＬＳ,Mga Kontrol sa Pagtapik,Touch-Steuerung,Dokunmatik Kontroller,Kontrol Sentuh,Controles de Toque,タッチ操作
+OSC_VISIBILITY,,Visibility,Visibilité,Widoczność,bидиmoctь,Visibilidad,Visibilità,ＶＩＳＩＢＩＬＩＴＹ,Pagpapakita,Sichtbarkeit,Görünürlük,Visibilitas,Visibilidade,可視性
+OSC_TRANSITION_VISIBILITY,,During Transitions,Pendant les transitions,Podczas przejść,bo bpemя пepexoдob,Durante las transiciones,Durante le transizioni,ＤＵＲＩＮＧ ＴＲＡＮＳＩＴＩＯＮＳ,Habang May Paglipat,Bei Übergängen,Geçişler Sırasında,Selama Transisi,Durante as Transições,切り替え中
+OSC_HAPTIC_FEEDBACK,,Haptic Feedback,Retour haptique,Wibracje,bибpootkлиk,Vibración,Feedback aptico,ＨＡＰＴＩＣ ＦＥＥＤＢＡＣＫ,Pagyanig,Haptisches Feedback,Dokunsal Geri Bildirim,Umpan Balik Haptik,Feedback Háptico,触覚フィードバック
+SETTING_SHOW,,Show,Afficher,Pokaż,Пokaзatь,Mostrar,Mostra,ＳＨＯＷ,Ipakita,Anzeigen,Göster,Tampilkan,Mostrar,表示
+SETTING_AUTO,,Auto,Auto,Auto,abto,Auto,Auto,ＡＵＴＯ,Awtomatiko,Auto,Otomatik,Otomatis,Automático,自動
+SETTING_HIDE,,Hide,Masquer,Ukryj,ckpыtь,Ocultar,Nascondi,ＨＩＤＥ,Itago,Ausblenden,Gizle,Sembunyikan,Ocultar,非表示
 ,,,,,,,,,,,,,,
 ,,,,,,,,,,,,,,
 ,,,,,,,,,,,,,,

@@ -16,6 +16,16 @@ var active = false
 
 signal opened
 
+@onready var controller_reset_label: Label = $PanelContainer/MarginContainer/VBoxContainer/Controller/Label
+var controller_resetting := false
+var controller_reset_time : float
+var last_controller_reset : float
+
+@onready var osc_reset_label: Label = $PanelContainer/MarginContainer/VBoxContainer/OnScreenControls/Label
+var osc_resetting := false
+var osc_reset_time : float
+var last_osc_reset : float
+
 func _process(_delta: float) -> void:
 	category_select_active = current_container.selected_index == -1 and active
 	%Category.text = tr(current_container.category_name)
@@ -34,6 +44,42 @@ func _process(_delta: float) -> void:
 		handle_inputs()
 	if Input.is_action_just_pressed("ui_back") and active and current_container.can_input and can_move:
 		close()
+	
+	if controller_resetting:
+		var remaining := 3.0 - (Time.get_unix_time_from_system() - controller_reset_time)
+		if remaining < 0.0001:
+			controller_reset_label.text = "SUCCESSFULLY RESET BINDINGS!"
+			Input.action_press("ui_reset_keybindings")
+			Input.action_release("ui_reset_keybindings")
+			last_controller_reset = Time.get_unix_time_from_system()
+		else:
+			var remaining_seconds : int = floor(remaining)
+			var remaining_millis : int = floor(remaining*1000) - remaining_seconds*1000
+			var remaining_millis_s : String = str(remaining_millis) if remaining_millis > 99 else "0" + str(remaining_millis) if remaining_millis > 9 else "00" + str(remaining_millis) if remaining_millis > 0 else "000"
+			controller_reset_label.text = "HOLD FOR %s.%sS TO RESET..." % [remaining_seconds, remaining_millis_s ]
+	elif controller_reset_label.text != "TAP AND HOLD HERE TO RESET." and Time.get_unix_time_from_system() - last_controller_reset > 3.0:
+		controller_reset_label.text = "TAP AND HOLD HERE TO RESET."
+	
+	if osc_resetting:
+		var remaining := 3.0 - (Time.get_unix_time_from_system() - osc_reset_time)
+		if remaining < 0.0001:
+			osc_reset_label.text = "SUCCESSFULLY RESET OPTIONS!"
+			
+			$PanelContainer/MarginContainer/VBoxContainer/OnScreenControls/Visibility.selected_index = 0
+			$PanelContainer/MarginContainer/VBoxContainer/OnScreenControls/Visibility.emit_signal("value_changed")
+			$PanelContainer/MarginContainer/VBoxContainer/OnScreenControls/TransitionVisibility.selected_index = 1
+			$PanelContainer/MarginContainer/VBoxContainer/OnScreenControls/TransitionVisibility.emit_signal("value_changed")
+			$PanelContainer/MarginContainer/VBoxContainer/OnScreenControls/HapticFeedback.selected_index = 0
+			$PanelContainer/MarginContainer/VBoxContainer/OnScreenControls/HapticFeedback.emit_signal("value_changed")
+			
+			last_osc_reset = Time.get_unix_time_from_system()
+		else:
+			var remaining_seconds : int = floor(remaining)
+			var remaining_millis : int = floor(remaining*1000) - remaining_seconds*1000
+			var remaining_millis_s : String = str(remaining_millis) if remaining_millis > 99 else "0" + str(remaining_millis) if remaining_millis > 9 else "00" + str(remaining_millis) if remaining_millis > 0 else "000"
+			osc_reset_label.text = "HOLD FOR %s.%sS TO RESET..." % [remaining_seconds, remaining_millis_s ]
+	elif osc_reset_label.text != "TAP AND HOLD HERE TO RESET." and Time.get_unix_time_from_system() - last_osc_reset > 3.0:
+		osc_reset_label.text = "TAP AND HOLD HERE TO RESET."
 
 func handle_inputs() -> void:
 	var direction := 0
@@ -88,9 +134,17 @@ func close() -> void:
 	process_mode = Node.PROCESS_MODE_DISABLED
 
 func on_controller_reset_button_down() -> void:
-	print("button down")
-	Input.action_press("ui_reset_keybindings")
+	#Input.action_press("ui_reset_keybindings")
+	controller_resetting = true
+	controller_reset_time = Time.get_unix_time_from_system()
 
 func on_controller_reset_button_up() -> void:
-	print("button up")
-	Input.action_release("ui_reset_keybindings")
+	#Input.action_release("ui_reset_keybindings")
+	controller_resetting = false
+
+func on_osc_reset_button_down() -> void:
+	osc_resetting = true
+	osc_reset_time = Time.get_unix_time_from_system()
+
+func on_osc_reset_button_up() -> void:
+	osc_resetting = false

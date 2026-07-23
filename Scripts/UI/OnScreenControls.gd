@@ -41,23 +41,19 @@ var run_lock_on := false
 var vibration_thread: Thread
 var should_show: bool
 
-# debug cooldown of 5 seconds at 60 fps, 2,5 seconds at 120 fps
-var counter := 300
-
 func _process(_delta : float) -> void:
-	var connected := detect_real_joysticks()
-	if connected.size() > 0 || !should_show:
+	if Settings.file.osc.visibility == 2:
 		hide()
-		# this whole 5s interval debugging should prolly be removed eventually, if there are no further reports of missing touch controls coming in. 
-		if counter == 300:
-			print("connected: ", connected)
-			print("connected/size(): ", connected.size())
-			print("connected/should_show: ", should_show)
-	else:
-		show()
-	counter = counter - 1 if counter > 0 else 300
+		return
+	var connected := detect_real_joysticks()
+	if (Settings.file.osc.visibility == 1 && connected.size() > 0) || (!should_show && Settings.file.osc.transition_visibility == 1):
+		hide()
+		return
+	show()
 
 func vibrate_asynchronously() -> void:
+	if Settings.file.osc.haptic_feedback == 1:
+		return
 	if vibration_thread != null:
 		if vibration_thread.is_alive():
 			return
@@ -169,15 +165,12 @@ func detect_real_joysticks() -> Array:
 
 	for i in Input.get_connected_joypads():
 		var joy_name = Input.get_joy_name(i)
-		var is_fake := false
+		var is_real := true
 		for j in BLACKLIST:
 			if joy_name.begins_with(j):
-				is_fake = true
-		if is_fake:
-			if counter == 300: print(joy_name, " detected!")
-		else:
+				is_real = false
+		if is_real:
 			realJoysticks.append(i)
-			if counter == 300: print(joy_name, " is valid!")
 	return realJoysticks if (realJoysticks.size() > 0) else []
 
 func _exit_tree():
