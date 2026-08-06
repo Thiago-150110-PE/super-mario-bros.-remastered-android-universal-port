@@ -1,0 +1,70 @@
+name: Build Android APK
+
+on:
+  workflow_dispatch: {}   # te deja darle "Run workflow" manualmente desde la web/app de GitHub
+  push:
+    branches: [ main ]
+    paths:
+      - export_presets.cfg
+
+jobs:
+  export-android:
+    runs-on: ubuntu-latest
+    env:
+      GODOT_VERSION: "4.5-beta3"
+      GODOT_ZIP: "Godot_v4.5-beta3_linux.x86_64.zip"
+      GODOT_TEMPLATES: "Godot_v4.5-beta3_export_templates.tpz"
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Instalar Java (requerido por Gradle)
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Instalar Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Instalar NDK y CMake requeridos por Godot
+        run: |
+          sdkmanager --install "ndk;23.2.8568313" "cmake;3.10.2.4988404"
+
+      - name: Descargar Godot headless (editor sin interfaz)
+        run: |
+          wget -q "https://github.com/godotengine/godot-builds/releases/download/${GODOT_VERSION}/${GODOT_ZIP}"
+          unzip -q "${GODOT_ZIP}"
+          mv Godot_v${GODOT_VERSION}_linux.x86_64 godot
+          chmod +x godot
+
+      - name: Descargar plantillas de exportación (export templates)
+        run: |
+          wget -q "https://github.com/godotengine/godot-builds/releases/download/${GODOT_VERSION}/${GODOT_TEMPLATES}"
+          mkdir -p ~/.local/share/godot/export_templates/4.5.beta3
+          unzip -q "${GODOT_TEMPLATES}"
+          mv templates/* ~/.local/share/godot/export_templates/4.5.beta3/
+
+      - name: Descargar librerías .aar del build de Android (mencionadas en el README del proyecto)
+        run: |
+          mkdir -p android/build/libs/release android/build/libs/debug
+          wget -q -O android/build/libs/release/godot-lib.template_release.aar \
+            "https://github.com/mircey/Godot-Android-Export-Template-libs/releases/download/4.5b3/godot-lib.template_release.aar"
+          wget -q -O android/build/libs/debug/godot-lib.template_debug.aar \
+            "https://github.com/mircey/Godot-Android-Export-Template-libs/releases/download/4.5b3/godot-lib.template_debug.aar"
+
+      - name: Instalar la plantilla de build de Gradle (equivalente al botón "Instalar plantilla" del editor)
+        run: |
+          ./godot --headless --export-debug "Android" /tmp/discard.apk --install-android-build-template || true
+
+      - name: Exportar el APK (release)
+        run: |
+          mkdir -p build
+          ./godot --headless --export-release "Android" build/SMB1R-32bits.apk
+
+      - name: Subir el APK como artifact descargable
+        uses: actions/upload-artifact@v4
+        with:
+          name: SMB1R-android-32bits
+          path: build/SMB1R-32bits.apk
