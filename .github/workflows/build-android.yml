@@ -61,7 +61,21 @@ jobs:
       - name: Exportar el APK (debug — no requiere keystore de release)
         run: |
           mkdir -p build
-          ./godot --headless --export-debug "Android" build/SMB1R-32bits.apk
+          # Godot en modo headless a veces truena (signal 11) justo AL CERRARSE,
+          # después de haber exportado con éxito, por limpieza de gráficos en un
+          # entorno sin GPU real. Usamos --rendering-driver dummy para evitarlo,
+          # y "|| true" para no dejar que ese posible crash tumbe el job entero.
+          ./godot --headless --rendering-driver dummy --export-debug "Android" build/SMB1R-32bits.apk || true
+
+      - name: Verificar que el APK realmente se generó
+        run: |
+          if [ -s build/SMB1R-32bits.apk ]; then
+            echo "APK generado correctamente:"
+            ls -lh build/SMB1R-32bits.apk
+          else
+            echo "El APK no se generó. Revisa el log del paso anterior."
+            exit 1
+          fi
 
       - name: Subir el APK como artifact descargable
         uses: actions/upload-artifact@v4
