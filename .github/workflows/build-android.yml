@@ -20,7 +20,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Instalar Java (requerido por Gradle)
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           distribution: temurin
           java-version: '17'
@@ -58,10 +58,10 @@ jobs:
         run: |
           ./godot --headless --export-debug "Android" /tmp/discard.apk --install-android-build-template || true
 
-      - name: Exportar el APK (release)
+      - name: Exportar el APK (debug — no requiere keystore de release)
         run: |
           mkdir -p build
-          ./godot --headless --export-release "Android" build/SMB1R-32bits.apk
+          ./godot --headless --export-debug "Android" build/SMB1R-32bits.apk
 
       - name: Subir el APK como artifact descargable
         uses: actions/upload-artifact@v4
