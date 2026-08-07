@@ -32,8 +32,10 @@ const LOG_NAME := "ModLoader"
 
 
 func _init() -> void:
+	OS.alert("[DEBUG] mod_loader._init START: %d ms" % Time.get_ticks_msec())
 	# if mods are not enabled - don't load mods
 	if ModLoaderStore.REQUIRE_CMD_LINE and not _ModLoaderCLI.is_running_with_command_line_arg("--enable-mods"):
+		OS.alert("[DEBUG] mod_loader._init END (early-return: cmd line): %d ms" % Time.get_ticks_msec())
 		return
 
 	# Only load the hook pack if not in the editor
@@ -47,6 +49,7 @@ func _init() -> void:
 
 	if not ModLoaderStore.ml_options.enable_mods:
 		ModLoaderLog.info("Mods are currently disabled", LOG_NAME)
+		OS.alert("[DEBUG] mod_loader._init END (early-return: mods disabled): %d ms" % Time.get_ticks_msec())
 		return
 
 	# Ensure the ModLoaderStore and ModLoader autoloads are in the correct position.
@@ -207,6 +210,7 @@ func _init() -> void:
 	ModLoaderStore.is_initializing = false
 
 	new_hooks_created.connect(_ModLoaderHooks.on_new_hooks_created)
+	OS.alert("[DEBUG] mod_loader._init END: %d ms" % Time.get_ticks_msec())
 
 
 func _ready():
