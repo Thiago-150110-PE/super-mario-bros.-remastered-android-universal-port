@@ -430,8 +430,11 @@ func on_score_sfx_finished() -> void:
 func get_server_version() -> void:
 	var http = HTTPRequest.new()
 	add_child(http)
+	http.timeout = 5.0  # máximo 5 segundos de espera; si no responde, se cancela sola
 	http.request_completed.connect(version_got)
-	http.request(VERSION_CHECK_URL, [], HTTPClient.METHOD_GET)
+	var err := http.request(VERSION_CHECK_URL, [], HTTPClient.METHOD_GET)
+	if err != OK:
+		server_version = -2  # falla silenciosa: no hay internet o el request no pudo iniciarse
 
 func version_got(_result, response_code, _headers, body) -> void:
 	if response_code == 200:
