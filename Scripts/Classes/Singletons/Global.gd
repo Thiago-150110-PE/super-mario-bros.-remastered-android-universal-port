@@ -177,21 +177,35 @@ var debug_mode := false
 
 var game_viewport
 
+func _debug_perf_log(msg := "") -> void:
+	var path = "user://logs/perf_debug.log"
+	DirAccess.make_dir_recursive_absolute("user://logs")
+	var existing := ""
+	if FileAccess.file_exists(path):
+		var rf = FileAccess.open(path, FileAccess.READ)
+		if rf:
+			existing = rf.get_as_text()
+			rf.close()
+	var wf = FileAccess.open(path, FileAccess.WRITE)
+	if wf:
+		wf.store_string(existing + "[%d ms] %s\n" % [Time.get_ticks_msec(), msg])
+		wf.close()
+
 func _ready() -> void:
-	OS.alert("[DEBUG] Global._ready() START: %d ms desde que arrancó el motor" % Time.get_ticks_msec())
+	_debug_perf_log("[DEBUG] Global._ready() START")
 	if is_snapshot: get_build_time()
 	if OS.is_debug_build(): debug_mode = false
 	current_version = get_version_number()
 	get_server_version()
 	setup_config_dirs()
 	check_for_rom()
-	OS.alert("[DEBUG] Global._ready() antes de await process_frame: %d ms" % Time.get_ticks_msec())
+	_debug_perf_log("[DEBUG] Global._ready() antes de await process_frame")
 	
 	await get_tree().process_frame  # Wait for scene tree to be ready
 	game_viewport = get_tree().root.get_node("Wrapper/CenterContainer/SubViewportContainer/SubViewport")
 	if game_viewport:
 		reparent(game_viewport)
-	OS.alert("[DEBUG] Global._ready() END: %d ms" % Time.get_ticks_msec())
+	_debug_perf_log("[DEBUG] Global._ready() END")
 
 func setup_config_dirs() -> void:
 	var dirs = [
