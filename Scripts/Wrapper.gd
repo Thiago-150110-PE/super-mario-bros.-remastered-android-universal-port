@@ -48,13 +48,21 @@ func change_scene_to(path) -> void:
 
 	var _ready_end_ms := Time.get_ticks_msec()
 
-	# [DEBUG] Muestra en pantalla cuánto tardó cada tramo real de la carga.
+	# [DEBUG] Muestra en pantalla cuánto tardó cada tramo real de la carga,
+	# y lo guarda también en el archivo user://logs/perf_debug.log
 	print("[DEBUG] %s | read+parse: %dms | instantiate+ready: %dms | TOTAL: %dms" % [
 		path.get_file(),
 		_load_end_ms - _load_start_ms,
 		_ready_end_ms - _load_end_ms,
 		_ready_end_ms - _load_start_ms
 	])
+	if is_instance_valid(Global) and Global.has_method("_debug_perf_log"):
+		Global._debug_perf_log("[Wrapper] %s | read+parse: %dms | instantiate+ready: %dms | TOTAL: %dms" % [
+			path.get_file(),
+			_load_end_ms - _load_start_ms,
+			_ready_end_ms - _load_end_ms,
+			_ready_end_ms - _load_start_ms
+		])
 	if is_instance_valid(Global):
 		Global.log_comment("[DEBUG] %s\nread+parse: %dms | instantiate+ready: %dms | TOTAL: %dms" % [
 			path.get_file(),
