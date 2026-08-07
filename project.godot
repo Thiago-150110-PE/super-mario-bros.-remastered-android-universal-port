@@ -46,6 +46,7 @@ gdscript/warnings/narrowing_conversion=0
 
 [display]
 
+window/vsync/vsync_mode=1
 window/size/viewport_width=256
 window/size/viewport_height=240
 window/size/window_width_override=1024
@@ -523,6 +524,7 @@ common/physics_interpolation=true
 
 textures/canvas_textures/default_texture_filter=0
 renderer/rendering_method="mobile"
+renderer/rendering_method.mobile="mobile"
 textures/vram_compression/import_etc2_astc=true
 textures/default_filters/anisotropic_filtering_level=0
 textures/decals/filter=0
