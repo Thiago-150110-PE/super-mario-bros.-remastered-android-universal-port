@@ -104,6 +104,13 @@ var character_sfx_map := {}
 var audio_override_queue := []
 #var audio_override_queue: Array[Dictionary] = []
 
+# Caché de AudioStreams ya leídos de disco, para no releer el mismo
+# .wav/.mp3/.ogg cada vez que un efecto de sonido se reproduce.
+# Esto es lo que causaba los tirones al agarrar powerups, matar
+# enemigos, etc. — cada sonido releía su archivo desde disco en
+# cada reproducción en vez de reutilizar el ya cargado.
+var _stream_cache: Dictionary = {}
+
 func play_sfx(stream_name = "", position := Vector2.ZERO, pitch := 1.0) -> void:
 
 	if queued_sfxs.has(stream_name):
@@ -302,6 +309,10 @@ func generate_interactive_stream(bgm_file := {}) -> AudioStreamInteractive:
 
 func import_stream(file_path := "", loop_point := -1.0) -> AudioStream:
 	var path = file_path
+	# Si ya cargamos este archivo antes, reusamos el resultado en vez
+	# de volver a leerlo/decodificarlo de disco.
+	if _stream_cache.has(path):
+		return _stream_cache[path]
 	var stream = null
 	if path.contains("res://"):
 		stream = load(path)
@@ -318,5 +329,6 @@ func import_stream(file_path := "", loop_point := -1.0) -> AudioStream:
 	elif path.contains(".ogg"):
 		stream.set_loop(loop_point >= 0)
 		stream.set_loop_offset(loop_point)
+	_stream_cache[path] = stream
 	return stream
 	
