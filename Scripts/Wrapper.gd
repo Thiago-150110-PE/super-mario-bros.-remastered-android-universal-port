@@ -10,6 +10,8 @@ func _ready() -> void:
 	await change_scene_to("res://Scenes/Levels/Disclaimer.tscn")
 
 func change_scene_to(path) -> void:
+	var _load_start_ms := Time.get_ticks_msec()
+
 	for child in game_viewport.get_children():
 		if child.name != "Global":
 			child.queue_free()
@@ -37,10 +39,29 @@ func change_scene_to(path) -> void:
 		push_error("Fallo al cargar en segundo plano: " + path)
 		return
 
+	var _load_end_ms := Time.get_ticks_msec()
+
 	var new_scene = ResourceLoader.load_threaded_get(path).instantiate()
 	game_viewport.add_child(new_scene)
 	
 	await new_scene.ready
+
+	var _ready_end_ms := Time.get_ticks_msec()
+
+	# [DEBUG] Muestra en pantalla cuánto tardó cada tramo real de la carga.
+	print("[DEBUG] %s | read+parse: %dms | instantiate+ready: %dms | TOTAL: %dms" % [
+		path.get_file(),
+		_load_end_ms - _load_start_ms,
+		_ready_end_ms - _load_end_ms,
+		_ready_end_ms - _load_start_ms
+	])
+	if is_instance_valid(Global):
+		Global.log_comment("[DEBUG] %s\nread+parse: %dms | instantiate+ready: %dms | TOTAL: %dms" % [
+			path.get_file(),
+			_load_end_ms - _load_start_ms,
+			_ready_end_ms - _load_end_ms,
+			_ready_end_ms - _load_start_ms
+		])
 
 func get_game_viewport() -> SubViewport:
 	return game_viewport
