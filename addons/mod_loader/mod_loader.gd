@@ -31,11 +31,25 @@ signal new_hooks_created
 const LOG_NAME := "ModLoader"
 
 
+func _debug_perf_log(msg := "") -> void:
+	var path = "user://logs/perf_debug.log"
+	DirAccess.make_dir_recursive_absolute("user://logs")
+	var existing := ""
+	if FileAccess.file_exists(path):
+		var rf = FileAccess.open(path, FileAccess.READ)
+		if rf:
+			existing = rf.get_as_text()
+			rf.close()
+	var wf = FileAccess.open(path, FileAccess.WRITE)
+	if wf:
+		wf.store_string(existing + "[%d ms] %s\n" % [Time.get_ticks_msec(), msg])
+		wf.close()
+
 func _init() -> void:
-	OS.alert("[DEBUG] mod_loader._init START: %d ms" % Time.get_ticks_msec())
+	_debug_perf_log("[DEBUG] mod_loader._init START")
 	# if mods are not enabled - don't load mods
 	if ModLoaderStore.REQUIRE_CMD_LINE and not _ModLoaderCLI.is_running_with_command_line_arg("--enable-mods"):
-		OS.alert("[DEBUG] mod_loader._init END (early-return: cmd line): %d ms" % Time.get_ticks_msec())
+		_debug_perf_log("[DEBUG] mod_loader._init END (early-return: cmd line)")
 		return
 
 	# Only load the hook pack if not in the editor
@@ -49,7 +63,7 @@ func _init() -> void:
 
 	if not ModLoaderStore.ml_options.enable_mods:
 		ModLoaderLog.info("Mods are currently disabled", LOG_NAME)
-		OS.alert("[DEBUG] mod_loader._init END (early-return: mods disabled): %d ms" % Time.get_ticks_msec())
+		_debug_perf_log("[DEBUG] mod_loader._init END (early-return: mods disabled)")
 		return
 
 	# Ensure the ModLoaderStore and ModLoader autoloads are in the correct position.
@@ -210,7 +224,7 @@ func _init() -> void:
 	ModLoaderStore.is_initializing = false
 
 	new_hooks_created.connect(_ModLoaderHooks.on_new_hooks_created)
-	OS.alert("[DEBUG] mod_loader._init END: %d ms" % Time.get_ticks_msec())
+	_debug_perf_log("[DEBUG] mod_loader._init END")
 
 
 func _ready():
